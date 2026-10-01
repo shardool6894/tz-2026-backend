@@ -55,7 +55,7 @@ function normalizeEvent(raw, index = 0) {
     contact: parseContacts(raw["POC for doubts - name and phone number"]),
     totalCost: parsePrize(description),
     judgingCriteria: "Coming Soon...",
-    imgsrc: "",
+    imgsrc: (raw["Poster"] || "").toString().trim(),
     glink: "",
     venue: "",
     registrationOpen: true,
