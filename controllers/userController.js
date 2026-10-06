@@ -30,20 +30,8 @@ const getUserEvents = async (req, res) => {
     }
 };
 
-// Same shape the login/register responses return, so the frontend can swap it straight in
-const toPublicUser = (user) => ({
-    name: user.name,
-    email: user.email,
-    role: user.roles,
-    collegeName: user.collegeName || null,
-    accommodation: !!user.accommodation,
-    registrationType: user.registrationType,
-    teamMembers: user.teamMembers || [],
-    events: user.events || [],
-    idDocumentUrl: user.idDocumentUrl,
-    paymentScreenshotUrl: user.paymentScreenshotUrl,
-    registrationNum: user.registrationNum
-});
+const { toPublicUser } = require('../utils/publicUser');
+const { attachUserToEventRegistration } = require('./teamController');
 const getMe = (req, res) => {
     res.json({ user: toPublicUser(req.user) });
 };
@@ -71,6 +59,10 @@ const addMyEvents = async (req, res) => {
             { new: true }
         ).select('-password');
 
+        for (const id of ids) {
+            await attachUserToEventRegistration(id, req.user._id);
+        }
+
         res.json({ user: toPublicUser(updated), added });
     } catch (err) {
         console.error('addMyEvents error:', err);
@@ -78,4 +70,27 @@ const addMyEvents = async (req, res) => {
     }
 };
 
-module.exports = { getUserEvents, getMe, addMyEvents };
+const lookupUserByEmail = async (req, res) => {
+    try {
+        const email = String(req.query.email || '').trim().toLowerCase();
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+        const found = await User.findOne({ email }).select('name email').lean();
+        if (!found) {
+            return res.status(404).json({ message: 'No user found with that email' });
+        }
+        res.json({
+            user: {
+                id: String(found._id),
+                name: found.name || '',
+                email: found.email || '',
+            },
+        });
+    } catch (err) {
+        console.error('lookupUserByEmail error:', err);
+        res.status(500).json({ message: 'Could not look up user' });
+    }
+};
+
+module.exports = { getUserEvents, getMe, addMyEvents, lookupUserByEmail, toPublicUser };

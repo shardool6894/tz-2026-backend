@@ -24,7 +24,10 @@ const pickWritableFields = (body) => {
 // GET /api/events
 const listEvents = async (req, res) => {
     try {
-        const events = await Event.find().sort({ startTime: 1 }).lean();
+        const events = await Event.find()
+            .select('-users -teams')
+            .sort({ startTime: 1 })
+            .lean();
         res.json({ count: events.length, events });
     } catch (err) {
         console.error('listEvents error:', err);
@@ -39,7 +42,7 @@ const getEvent = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(eventId)) {
             return res.status(400).json({ message: 'Invalid event id' });
         }
-        const event = await Event.findById(eventId).lean();
+        const event = await Event.findById(eventId).select('-users -teams').lean();
         if (!event) return res.status(404).json({ message: 'Event not found' });
         res.json(event);
     } catch (err) {

@@ -23,7 +23,16 @@ const eventSchema = new mongoose.Schema({
     rules: { type: [String], default: [] },
     judgingCriteria: { type: String, default: 'Coming Soon...' },
     contact: { type: [contactSchema], default: [] },
-    glink: { type: String, default: '' }
+    glink: { type: String, default: '' },
+    users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    teams: [{
+        leader: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        pendingInvites: [{
+            invitee: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            invitedAt: { type: Date, default: Date.now }
+        }]
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);
