@@ -78,4 +78,4 @@ const addMyEvents = async (req, res) => {
     }
 };
 
-+module.exports = { getUserEvents, getMe, addMyEvents };
+module.exports = { getUserEvents, getMe, addMyEvents };
