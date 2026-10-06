@@ -1,0 +1,91 @@
+From c5fefebf0dd2618bf21b83b4b90f7cfc0d796e36 Mon Sep 17 00:00:00 2001
+From: scratch <a@b.c>
+Date: Mon, 5 Oct 2026 18:42:48 +0000
+Subject: [PATCH 1/2] Add GET /api/users/me and POST /api/users/me/events
+
+---
+ BACKEND/controllers/userController.js | 53 ++++++++++++++++++++++++++-
+ BACKEND/routes/users.js               |  4 +-
+ 2 files changed, 55 insertions(+), 2 deletions(-)
+
+diff --git a/BACKEND/controllers/userController.js b/BACKEND/controllers/userController.js
+index 5555d57..f359907 100644
+--- a/BACKEND/controllers/userController.js
++++ b/BACKEND/controllers/userController.js
+@@ -30,4 +30,55 @@ const getUserEvents = async (req, res) => {
+     }
+ };
+ 
+-module.exports = { getUserEvents };
++// Same shape the login/register responses return, so the frontend can swap it straight in
++const toPublicUser = (user) => ({
++    name: user.name,
++    email: user.email,
++    role: user.roles,
++    collegeName: user.collegeName || null,
++    accommodation: !!user.accommodation,
++    registrationType: user.registrationType,
++    teamMembers: user.teamMembers || [],
++    events: user.events || [],
++    idDocumentUrl: user.idDocumentUrl,
++    paymentScreenshotUrl: user.paymentScreenshotUrl,
++    registrationNum: user.registrationNum
++});
++
++// GET /api/users/me - fresh copy of the logged-in user (protect has just loaded it from the DB)
++const getMe = (req, res) => {
++    res.json({ user: toPublicUser(req.user) });
++};
++
++// POST /api/users/me/events - add events to the logged-in user's registration
++const addMyEvents = async (req, res) => {
++    try {
++        const { events } = req.body || {};
++        const ids = [...new Set((Array.isArray(events) ? events : []).map(String))];
++        if (ids.length === 0 || !ids.every((id) => mongoose.Types.ObjectId.isValid(id))) {
++            return res.status(400).json({ message: 'Select at least one valid event' });
++        }
++
++        const validCount = await Event.countDocuments({ _id: { $in: ids }, registrationOpen: true });
++        if (validCount !== ids.length) {
++            return res.status(400).json({ message: 'One or more selected events are invalid or closed' });
++        }
++
++        const already = new Set((req.user.events || []).map(String));
++        const added = ids.filter((id) => !already.has(id)).length;
++
++        // $addToSet never duplicates an event the user already has
++        const updated = await User.findByIdAndUpdate(
++            req.user._id,
++            { $addToSet: { events: { $each: ids } } },
++            { new: true }
++        ).select('-password');
++
++        res.json({ user: toPublicUser(updated), added });
++    } catch (err) {
++        console.error('addMyEvents error:', err);
++        res.status(500).json({ message: 'Could not add events' });
++    }
++};
++
++module.exports = { getUserEvents, getMe, addMyEvents };
+diff --git a/BACKEND/routes/users.js b/BACKEND/routes/users.js
+index 9c4f38e..3a1df4d 100644
+--- a/BACKEND/routes/users.js
++++ b/BACKEND/routes/users.js
+@@ -1,8 +1,10 @@
+ const express = require('express');
+ const router = express.Router();
+ const { protect, requireAdmin } = require('../middleware/auth');
+-const { getUserEvents } = require('../controllers/userController');
++const { getUserEvents, getMe, addMyEvents } = require('../controllers/userController');
+ 
++router.get('/me', protect, getMe);
++router.post('/me/events', protect, addMyEvents);
+ router.get('/:userId/events', protect, requireAdmin, getUserEvents);
+ 
+ module.exports = router;
+\ No newline at end of file
+-- 
+2.43.0
+
