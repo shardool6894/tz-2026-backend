@@ -58,12 +58,15 @@ const register = async (req, res) => {
             }
         }
         const eventIds = [...new Set((Array.isArray(events) ? events : []).map(String))];
-        if (eventIds.length === 0 || !eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
-            return res.status(400).json({ message: "Select at least one valid event" });
+        // Events are optional at registration; users can add them later from their profile
+        if (!eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
+            return res.status(400).json({ message: "One or more selected events are invalid" });
         }
-        const validCount = await Event.countDocuments({ _id: { $in: eventIds }, registrationOpen: true });
-        if (validCount !== eventIds.length) {
-            return res.status(400).json({ message: "One or more selected events are invalid or closed" });
+        if (eventIds.length > 0) {
+            const validCount = await Event.countDocuments({ _id: { $in: eventIds }, registrationOpen: true });
+            if (validCount !== eventIds.length) {
+                return res.status(400).json({ message: "One or more selected events are invalid or closed" });
+            }
         }
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
