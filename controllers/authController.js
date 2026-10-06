@@ -91,23 +91,23 @@ const register = async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.jwt_key, { expiresIn: '1h' });
 
         // Send response
-        // res.json({
-        //     user: {
-        //         name: user.name,
-        //         email: user.email,
-        //         role: user.roles,
-        //         collegeName: user.collegeName || null,
-        //         accommodation: !!user.accommodation,
-        //         registrationType: user.registrationType,
-        //         teamMembers: user.teamMembers || [],
-        //         events: user.events || [],
-        //         idDocumentUrl: user.idDocumentUrl,
-        //         paymentScreenshotUrl: user.paymentScreenshotUrl,
-        //         registrationNum: user.registrationNum
-        //     },
-        //     token
-        // });
-        res.status(400).json({message: "registration hasn't started"})
+        res.json({
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.roles,
+                collegeName: user.collegeName || null,
+                accommodation: !!user.accommodation,
+                registrationType: user.registrationType,
+                teamMembers: user.teamMembers || [],
+                events: user.events || [],
+                idDocumentUrl: user.idDocumentUrl,
+                paymentScreenshotUrl: user.paymentScreenshotUrl,
+                registrationNum: user.registrationNum
+            },
+            token
+        });
+        // res.status(400).json({message: "registration hasn't started"})
 
     } catch (err) {
         console.error('Register error:', err);
@@ -139,24 +139,24 @@ const login = async (req, res) => {
         if (!match) return res.status(400).json({ message: "Incorrect Password" });
         const token = jwt.sign({ id: user._id }, process.env.jwt_key, { expiresIn: '1h' });
 
-        // res.json({
-        //     user: {
-        //         name: user.name,
-        //         email: user.email,
-        //         role: user.roles,
-        //         collegeName: user.collegeName || null,
-        //         accommodation: !!user.accommodation,
-        //         registrationType: user.registrationType,
-        //         teamMembers: user.teamMembers || [],
-        //         events: user.events || [],
-        //         idDocumentUrl: user.idDocumentUrl,
-        //         paymentScreenshotUrl: user.paymentScreenshotUrl,
-        //         registrationNum: user.registrationNum
+        res.json({
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.roles,
+                collegeName: user.collegeName || null,
+                accommodation: !!user.accommodation,
+                registrationType: user.registrationType,
+                teamMembers: user.teamMembers || [],
+                events: user.events || [],
+                idDocumentUrl: user.idDocumentUrl,
+                paymentScreenshotUrl: user.paymentScreenshotUrl,
+                registrationNum: user.registrationNum
 
-        //     },
-        //     token
-        // });
-        res.status(400).json({message: "registration hasn't started"})
+            },
+            token
+        });
+        // res.status(400).json({message: "registration hasn't started"})
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ message: err.message });
