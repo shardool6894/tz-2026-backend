@@ -354,8 +354,46 @@ const attachUserToEventRegistration = async (eventId, userId) => {
   await event.save();
 };
 
+const listMyInvites = async (req, res) => {
+  try {
+    const events = await Event.find({
+      'teams.pendingInvites.invitee': req.user._id,
+      registrationOpen: { $ne: false },
+    }).select('name club teams');
+
+    const found = [];
+    for (const event of events) {
+      if (userRegisteredForEvent(req.user, event._id)) continue; // already in this event another way
+      const incoming = findIncomingInvite(event, req.user._id);
+      if (!incoming) continue;
+      found.push({
+        eventId: idStr(event._id),
+        eventName: event.name,
+        club: event.club || '',
+        leaderId: idStr(incoming.team.leader),
+        invitedAt: incoming.pending.invitedAt,
+      });
+    }
+
+    const leaders = await User.find({ _id: { $in: found.map((f) => f.leaderId) } })
+      .select('name email')
+      .lean();
+    const byId = new Map(leaders.map((u) => [idStr(u._id), u]));
+
+    const invites = found
+      .map(({ leaderId, ...rest }) => ({ ...rest, leader: pickPerson(byId.get(leaderId)) }))
+      .sort((a, b) => new Date(b.invitedAt) - new Date(a.invitedAt));
+
+    res.json({ invites });
+  } catch (err) {
+    console.error('listMyInvites error:', err);
+    res.status(500).json({ message: 'Could not load your team requests' });
+  }
+};
+
 module.exports = {
   getEventTeam,
+  listMyInvites,
   sendTeamInvite,
   acceptTeamInvite,
   declineTeamInvite,
