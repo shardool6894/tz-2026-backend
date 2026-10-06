@@ -6,6 +6,8 @@ const { toPublicUser } = require('../utils/publicUser');
 
 const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
 
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const idStr = (v) => String(v && v._id ? v._id : v);
 
 const pickPerson = (user) => {
@@ -85,6 +87,20 @@ const populateTeamPeople = async (event, team) => {
   return { leader, members, pendingOutgoing };
 };
 
+const applyTeamCapacity = (payload) => {
+  const max = payload.limits.max;
+  const headcount =
+    1 + (payload.members || []).length + (payload.pendingOutgoing || []).length;
+  payload.teamFull = headcount >= max;
+  payload.slotsRemaining = Math.max(0, max - headcount);
+  payload.canInvite =
+    payload.registered &&
+    payload.role === 'leader' &&
+    !payload.limits.isIndividual &&
+    !payload.teamFull;
+  return payload;
+};
+
 const buildTeamState = async (event, user) => {
   const limits = parseTeamSizeLimits(event.teamSize);
   const registered = userRegisteredForEvent(user, event._id);
@@ -101,7 +117,9 @@ const buildTeamState = async (event, user) => {
     registered,
     role,
     limits,
-    canInvite: registered && role === 'leader' && !limits.isIndividual,
+    canInvite: false,
+    teamFull: false,
+    slotsRemaining: limits.max,
     leader: null,
     members: [],
     pendingOutgoing: [],
@@ -113,7 +131,7 @@ const buildTeamState = async (event, user) => {
     payload.pendingIncoming = {
       leader: pickPerson(leaderUser),
     };
-    return payload;
+    return applyTeamCapacity(payload);
   }
 
   if (asLeader) {
@@ -121,12 +139,12 @@ const buildTeamState = async (event, user) => {
     payload.leader = populated.leader;
     payload.members = populated.members;
     payload.pendingOutgoing = populated.pendingOutgoing;
-    return payload;
+    return applyTeamCapacity(payload);
   }
 
   if (registered && role === 'leader' && !asLeader) {
     payload.leader = pickPerson(user);
-    return payload;
+    return applyTeamCapacity(payload);
   }
 
   if (asMember) {
@@ -134,10 +152,10 @@ const buildTeamState = async (event, user) => {
     const populated = await populateTeamPeople(event, team);
     payload.leader = populated.leader;
     payload.members = populated.members;
-    return payload;
+    return applyTeamCapacity(payload);
   }
 
-  return payload;
+  return applyTeamCapacity(payload);
 };
 
 const getEventTeam = async (req, res) => {
@@ -185,7 +203,9 @@ const sendTeamInvite = async (req, res) => {
       team = ensureLeaderTeam(event, req.user._id);
     }
 
-    const invitee = await User.findOne({ email }).select('_id name email events');
+    const invitee = await User.findOne({
+      email: { $regex: new RegExp(`^${escapeRegex(email)}$`, 'i') },
+    }).select('_id name email events');
     if (!invitee) {
       return res.status(404).json({ message: 'No registered user found with that email' });
     }

@@ -70,13 +70,19 @@ const addMyEvents = async (req, res) => {
     }
 };
 
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const lookupUserByEmail = async (req, res) => {
     try {
         const email = String(req.query.email || '').trim().toLowerCase();
         if (!email) {
             return res.status(400).json({ message: 'Email is required' });
         }
-        const found = await User.findOne({ email }).select('name email').lean();
+        const found = await User.findOne({
+            email: { $regex: new RegExp(`^${escapeRegex(email)}$`, 'i') },
+        })
+            .select('name email')
+            .lean();
         if (!found) {
             return res.status(404).json({ message: 'No user found with that email' });
         }
@@ -93,4 +99,31 @@ const lookupUserByEmail = async (req, res) => {
     }
 };
 
-module.exports = { getUserEvents, getMe, addMyEvents, lookupUserByEmail, toPublicUser };
+const searchUsersByEmail = async (req, res) => {
+    try {
+        const q = String(req.query.q || '').trim().toLowerCase();
+        if (q.length < 2) {
+            return res.status(400).json({ message: 'Type at least 2 characters to search' });
+        }
+        const users = await User.find({
+            _id: { $ne: req.user._id },
+            email: { $regex: escapeRegex(q), $options: 'i' },
+        })
+            .select('name email')
+            .limit(8)
+            .lean();
+
+        res.json({
+            users: users.map((u) => ({
+                id: String(u._id),
+                name: u.name || '',
+                email: u.email || '',
+            })),
+        });
+    } catch (err) {
+        console.error('searchUsersByEmail error:', err);
+        res.status(500).json({ message: 'Could not search users' });
+    }
+};
+
+module.exports = { getUserEvents, getMe, addMyEvents, lookupUserByEmail, searchUsersByEmail, toPublicUser };
