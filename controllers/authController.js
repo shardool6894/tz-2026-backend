@@ -113,7 +113,6 @@ const register = async (req, res) => {
             console.error('Verification email failed:', mailErr);
         }
 
-<<<<<<< HEAD
         res.status(201).json({
             message: emailSent
                 ? 'Account created. Check your email for a verification link before logging in.'
@@ -121,26 +120,6 @@ const register = async (req, res) => {
             email: user.email,
             emailSent
         });
-=======
-        // Send response
-        res.json({
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.roles,
-                collegeName: user.collegeName || null,
-                accommodation: !!user.accommodation,
-                registrationType: user.registrationType,
-                teamMembers: user.teamMembers || [],
-                events: user.events || [],
-                idDocumentUrl: user.idDocumentUrl,
-                paymentScreenshotUrl: user.paymentScreenshotUrl,
-                registrationNum: user.registrationNum
-            },
-            token
-        });
-        // res.status(400).json({message: "registration hasn't started"})
->>>>>>> e5653679fcc21b1408cff05878e1af620f212153
 
     } catch (err) {
         console.error('Register error:', err);
