@@ -65,6 +65,10 @@ const start = async () => {
     console.error('MongoDB connection failed:', err.message);
     process.exit(1);
   }
+  app.get('/api/health', (req, res) =>
+  res.json({ resendKey: !!process.env.RESEND_API_KEY, from: !!(process.env.RESEND_FROM_EMAIL || process.env.MAIL_FROM) })
+  );
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 };
 start();
+module.exports = app
