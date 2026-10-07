@@ -60,12 +60,15 @@ const register = async (req, res) => {
             }
         }
         const eventIds = [...new Set((Array.isArray(events) ? events : []).map(String))];
-        if (eventIds.length === 0 || !eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
-            return res.status(400).json({ message: "Select at least one valid event" });
+        // Events are optional at registration; users can add them later from their profile
+        if (!eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
+            return res.status(400).json({ message: "One or more selected events are invalid" });
         }
-        const validCount = await Event.countDocuments({ _id: { $in: eventIds }, registrationOpen: true });
-        if (validCount !== eventIds.length) {
-            return res.status(400).json({ message: "One or more selected events are invalid or closed" });
+        if (eventIds.length > 0) {
+            const validCount = await Event.countDocuments({ _id: { $in: eventIds }, registrationOpen: true });
+            if (validCount !== eventIds.length) {
+                return res.status(400).json({ message: "One or more selected events are invalid or closed" });
+            }
         }
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -110,6 +113,7 @@ const register = async (req, res) => {
             console.error('Verification email failed:', mailErr);
         }
 
+<<<<<<< HEAD
         res.status(201).json({
             message: emailSent
                 ? 'Account created. Check your email for a verification link before logging in.'
@@ -117,6 +121,26 @@ const register = async (req, res) => {
             email: user.email,
             emailSent
         });
+=======
+        // Send response
+        res.json({
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.roles,
+                collegeName: user.collegeName || null,
+                accommodation: !!user.accommodation,
+                registrationType: user.registrationType,
+                teamMembers: user.teamMembers || [],
+                events: user.events || [],
+                idDocumentUrl: user.idDocumentUrl,
+                paymentScreenshotUrl: user.paymentScreenshotUrl,
+                registrationNum: user.registrationNum
+            },
+            token
+        });
+        // res.status(400).json({message: "registration hasn't started"})
+>>>>>>> e5653679fcc21b1408cff05878e1af620f212153
 
     } catch (err) {
         console.error('Register error:', err);
@@ -172,6 +196,7 @@ const login = async (req, res) => {
             },
             token
         });
+        // res.status(400).json({message: "registration hasn't started"})
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ message: err.message });
