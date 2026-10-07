@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const { buildParticipantIdentities } = require('../utils/participantIdentity');
+const { toPublicUser } = require('../utils/publicUser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -14,6 +16,7 @@ const register = async (req, res) => {
             name,
             password,
             collegeName,
+            rollNumber,
             accommodation,
             registrationType = 'individual',
             teamMembers = [],
@@ -52,13 +55,16 @@ const register = async (req, res) => {
                 });
             }
             // Validate each team member has a name
-            const invalidMembers = teamMembers.filter(member => !member.name || member.name.trim() === '');
+            const invalidMembers = teamMembers.filter(member => !member || typeof member.name !== 'string' || !member.name.trim());
             if (invalidMembers.length > 0) {
                 return res.status(400).json({ 
                     message: "All team members must have a name" 
                 });
             }
         }
+        const identities = buildParticipantIdentities({
+            email, rollNumber, teamMembers: registrationType === 'team' ? teamMembers : [],
+        });
         const eventIds = [...new Set((Array.isArray(events) ? events : []).map(String))];
         // Events are optional at registration; users can add them later from their profile
         if (!eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
@@ -84,7 +90,7 @@ const register = async (req, res) => {
             collegeName: collegeName || undefined,
             accommodation: accommodationBool,
             registrationType,
-            teamMembers: registrationType === 'team' ? teamMembers : [],
+            ...identities,
             events: eventIds,
             idDocumentUrl,
             paymentScreenshotUrl : isNitwEmail(email) ? null : paymentScreenshotUrl,
@@ -119,10 +125,20 @@ const register = async (req, res) => {
                 ? 'Account created. Check your email for a verification link before logging in.'
                 : "Account created, but we couldn't send the verification email. Use \"Resend verification email\" on the login page.",
             email: user.email,
-            emailSent
+            emailSent,
+            participants: [
+                { name: user.name, studentType: user.studentType, rollNumber: user.rollNumber, participantId: user.participantId },
+                ...user.teamMembers.map((member) => ({
+                    name: member.name, studentType: member.studentType, rollNumber: member.rollNumber, participantId: member.participantId,
+                })),
+            ]
         });
 
     } catch (err) {
+        if (err.status === 400) return res.status(400).json({ message: err.message });
+        if (err.code === 11000 && err.keyPattern?.participantIds) {
+            return res.status(409).json({ message: 'A participant is already registered with that roll number. Please check the team details.' });
+        }
         console.error('Register error:', err);
         
         // Handle Mongoose validation errors
@@ -160,20 +176,7 @@ const login = async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.jwt_key, { expiresIn: '1h' });
 
         res.json({
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.roles,
-                collegeName: user.collegeName || null,
-                accommodation: !!user.accommodation,
-                registrationType: user.registrationType,
-                teamMembers: user.teamMembers || [],
-                events: user.events || [],
-                idDocumentUrl: user.idDocumentUrl,
-                paymentScreenshotUrl: user.paymentScreenshotUrl,
-                registrationNum: user.registrationNum
-
-            },
+            user: toPublicUser(user),
             token
         });
         // res.status(400).json({message: "registration hasn't started"})

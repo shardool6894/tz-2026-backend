@@ -109,7 +109,7 @@ const getEventRegistrations = async (req, res) => {
         }
 
         const registrations = await User.find({ events: eventId })
-            .select('name email collegeName registrationType teamMembers registrationNum accommodation')
+            .select('name email collegeName registrationType teamMembers registrationNum accommodation participantId rollNumber studentType')
             .lean();
 
         res.json({

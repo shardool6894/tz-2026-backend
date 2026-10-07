@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const teamMemberSchema = new mongoose.Schema({
-    name: { type: String, required: true }
+    name: { type: String, required: true },
+    studentType: { type: String, enum: ['nitw', 'external'] },
+    rollNumber: { type: String, default: null },
+    participantId: { type: String }
 }, { _id: false }); // _id: false prevents Mongoose from creating an _id for each team member
 
 const counterSchema = new mongoose.Schema({
@@ -15,6 +18,11 @@ const userSchema = new mongoose.Schema({
     email: { type: String, unique: true },
     password: String,
     collegeName: { type: String },
+    studentType: { type: String, enum: ['nitw', 'external'] },
+    rollNumber: { type: String, default: null },
+    participantId: { type: String },
+    // One multikey index covers IDs of both the leader and every embedded member.
+    participantIds: { type: [String], default: undefined, select: false },
     accommodation: { type: Boolean, default: false },
     registrationType: { 
         type: String, 
@@ -46,6 +54,9 @@ const userSchema = new mongoose.Schema({
     paymentScreenshotUrl: { type: String, default: null },
     registrationNum: { type: String, unique: true }
 }, { timestamps: true });
+
+// Sparse preserves existing accounts without changing their registration numbers.
+userSchema.index({ participantIds: 1 }, { unique: true, sparse: true });
 
 userSchema.pre('save', async function(next) {
   if (this.isNew) {
