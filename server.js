@@ -27,20 +27,8 @@ if (process.env.jwt_key.length < 16) {
   console.warn('Warning: jwt_key is very short. Use a long random string in production.');
 }
 const app = express();
-const allowedOrigins = (process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map((o) => o.trim().replace(/\/$/, ''))
-  .filter(Boolean);
-  
-app.use(cors({
-  origin: (origin, cb) => {
-    // no Origin header = curl/Postman/same-origin; allow
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-      return cb(null, true);
-    }
-    return cb(new Error('Not allowed by CORS'));
-  },
-}));
+const { createCorsOptions } = require('./utils/corsOptions');
+app.use(cors(createCorsOptions()));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

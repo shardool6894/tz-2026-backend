@@ -47,7 +47,7 @@ test('registration stores and returns IDs for the lead and all members', async (
   assert.equal(res.statusCode, 201);
   assert.equal(saved.participantId, '00123456');
   assert.equal(saved.teamMembers[0].rollNumber, '00123457');
-  assert.match(saved.teamMembers[1].participantId, /^26TZ[A-F0-9]{16}$/);
+  assert.match(saved.teamMembers[1].participantId, /^26TZ[A-Z0-9]{4}$/);
   assert.equal(res.body.participants.length, 3);
   assert.equal(res.body.participants[2].participantId, saved.teamMembers[1].participantId);
 });
@@ -78,4 +78,52 @@ test('login returns stored IDs unchanged', async () => {
   assert.equal(res.body.user.participantId, '00123456');
   assert.equal(res.body.user.teamMembers[1].participantId, stored.teamMembers[1].participantId);
   assert.equal(res.body.user.registrationNum, '042');
+});
+
+test('a generated outsider ID collision retries the save and preserves NITW identities', async () => {
+  let attempts = 0;
+  const controller = loadController({ findOne: async () => null, create: async payload => {
+    attempts++;
+    if (attempts === 1) throw Object.assign(new Error('duplicate'), {
+      code: 11000, keyPattern: { participantIds: 1 }, keyValue: { participantIds: payload.teamMembers[1].participantId },
+    });
+    assert.equal(payload.participantId, '00123456');
+    assert.equal(payload.teamMembers[0].participantId, '00123457');
+    assert.match(payload.teamMembers[1].participantId, /^26TZ[A-Z0-9]{4}$/);
+    return payload;
+  } });
+  const res = response();
+  await controller.register({ body }, res);
+  assert.equal(attempts, 2);
+  assert.equal(res.statusCode, 201);
+});
+
+test('NITW roll collisions do not retry or regenerate identities', async () => {
+  let attempts = 0;
+  const controller = loadController({ findOne: async () => null, create: async () => {
+    attempts++;
+    throw Object.assign(new Error('duplicate'), {
+      code: 11000, keyPattern: { participantIds: 1 }, keyValue: { participantIds: '00123457' },
+    });
+  } });
+  const res = response();
+  await controller.register({ body }, res);
+  assert.equal(attempts, 1);
+  assert.equal(res.statusCode, 409);
+  assert.match(res.body.message, /roll number/);
+});
+
+test('repeated outsider collisions stop after five attempts', async () => {
+  let attempts = 0;
+  const controller = loadController({ findOne: async () => null, create: async payload => {
+    attempts++;
+    throw Object.assign(new Error('duplicate'), {
+      code: 11000, keyPattern: { participantIds: 1 }, keyValue: { participantIds: payload.teamMembers[1].participantId },
+    });
+  } });
+  const res = response();
+  await controller.register({ body }, res);
+  assert.equal(attempts, 5);
+  assert.equal(res.statusCode, 409);
+  assert.match(res.body.message, /unique participant ID/);
 });

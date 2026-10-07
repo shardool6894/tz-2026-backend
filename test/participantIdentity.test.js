@@ -19,11 +19,11 @@ test('every member of a mixed team gets their own server-assigned identity', () 
       { name: 'External Student', studentType: 'external', participantId: 'spoofed', rollNumber: 'ignore-me' },
     ],
   });
-  assert.match(identities.participantId, /^26TZ[A-F0-9]{16}$/);
+  assert.match(identities.participantId, /^26TZ[A-Z0-9]{4}$/);
   assert.equal(identities.rollNumber, null);
   assert.equal(identities.teamMembers[0].participantId, '25ABC123');
   assert.equal(identities.teamMembers[0].name, 'NITW Student');
-  assert.match(identities.teamMembers[1].participantId, /^26TZ[A-F0-9]{16}$/);
+  assert.match(identities.teamMembers[1].participantId, /^26TZ[A-Z0-9]{4}$/);
   assert.equal(identities.teamMembers[1].rollNumber, null);
   assert.equal(new Set(identities.participantIds).size, 3);
 });
@@ -44,9 +44,9 @@ test('duplicate rolls within a team and unknown member classifications are rejec
   }), { status: 400 });
 });
 
-test('generated IDs are distinct across registrations', () => {
+test('generated outsider IDs are eight uppercase alphanumeric characters', () => {
   const ids = Array.from({ length: 100 }, () => buildParticipantIdentities({ email: 'outside@example.com' }).participantId);
-  assert.equal(new Set(ids).size, 100);
+  for (const id of ids) assert.match(id, /^26TZ[A-Z0-9]{4}$/);
 });
 
 test('Mongoose stores all participant fields and declares a cross-roster unique index', () => {

@@ -108,7 +108,24 @@ const register = async (req, res) => {
         // For true production readiness, OTP should be verified here. But to keep it simple and working:
         
         // Create user
-        const user = await User.create(userPayload);
+        let user;
+        for (let attempt = 0; attempt < 5; attempt++) {
+            try {
+                user = await User.create(userPayload);
+                break;
+            } catch (error) {
+                const conflictingId = error.keyValue?.participantIds;
+                const externalIds = [
+                    ...(userPayload.studentType === 'external' ? [userPayload.participantId] : []),
+                    ...userPayload.teamMembers.filter(member => member.studentType === 'external').map(member => member.participantId),
+                ];
+                if (attempt === 4 || error.code !== 11000 || !error.keyPattern?.participantIds || !externalIds.includes(conflictingId)) {
+                    throw error;
+                }
+                // A short random ID can collide; regenerate before retrying the atomic insert.
+                Object.assign(userPayload, buildParticipantIdentities({ email, rollNumber, teamMembers: registrationType === 'team' ? teamMembers : [] }));
+            }
+        }
 
         // No login token yet: the account must be verified first.
         // (Must be awaited: Vercel stops the function as soon as the response is sent.)
@@ -137,7 +154,9 @@ const register = async (req, res) => {
     } catch (err) {
         if (err.status === 400) return res.status(400).json({ message: err.message });
         if (err.code === 11000 && err.keyPattern?.participantIds) {
-            return res.status(409).json({ message: 'A participant is already registered with that roll number. Please check the team details.' });
+            return res.status(409).json({ message: /^26TZ[A-Z0-9]{4}$/.test(err.keyValue?.participantIds || '')
+                ? 'Could not assign a unique participant ID. Please try again.'
+                : 'A participant is already registered with that roll number. Please check the team details.' });
         }
         console.error('Register error:', err);
         
