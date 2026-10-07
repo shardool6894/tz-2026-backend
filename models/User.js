@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema({
         enum: ['individual', 'team'], 
         default: 'individual' 
     },
+    registrationNum: { type: String, unique: true },
+    emailVerified: { type: Boolean, default: false },
+    // select:false keeps these out of normal query results and API responses
+    emailVerificationTokenHash: { type: String, default: null, select: false },
+    emailVerificationExpires: { type: Date, default: null, select: false },
+    emailVerificationSentAt: { type: Date, default: null, select: false },
     teamMembers: { 
         type: [teamMemberSchema], 
         default: [],

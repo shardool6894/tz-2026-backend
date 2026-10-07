@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 
-const {register,login} = require('../controllers/authController')
+const {register,login,verifyEmail,resendVerification } = require('../controllers/authController')
 const { sendOtp, verifyOtp } = require('../controllers/otpController')
 
 // NOTE: multer removed — the backend expects either JSON metadata, pre-uploaded URLs,
@@ -14,4 +14,6 @@ router.post('/login', login)
 router.post('/send-otp', sendOtp)
 router.post('/verify-otp', verifyOtp)
 
+router.post('/verify-email', verifyEmail)
+router.post('/resend-verification', resendVerification)
 module.exports = router
