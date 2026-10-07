@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-//import contactSchema here before moving forward
 const contactSchema = new mongoose.Schema({
     name : {type: String, default: ''},
     email : { type: String, default: ''},
