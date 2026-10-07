@@ -31,7 +31,10 @@ const sendOtp = async (req, res) => {
 
     const resend = new Resend(apiKey);
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'Technozion <noreply@technozion.nitw.ac.in>';
+    const fromAddress = process.env.RESEND_FROM_EMAIL || process.env.MAIL_FROM;
+    if (!fromAddress) {
+      return res.status(500).json({ message: 'Email sender is not configured.' });
+    }
 
     const { error } = await resend.emails.send({
       from: fromAddress,

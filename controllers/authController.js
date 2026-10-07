@@ -74,6 +74,7 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const accommodationBool = accommodation === true || accommodation === 'true' || accommodation === '1' || accommodation === 1;
         const role = 'user'
+        const verification = newVerificationToken();
         // Prepare user payload
         const userPayload = {
             name,
