@@ -23,7 +23,7 @@
     "Approx time it takes for one student to complete the event": "On expo, depends on how long each student spends at a team. On pitch day, each team will pitch for 10-20 minutes",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "None",
     "POC for doubts - name and phone number": "Dhrithi - 6303078358 | Sanjana - 8885354347",
-    "Poster" : "/posters26/IMPACT_TANK.jpg"
+    "Poster" : "/posters26/impact_tank.jpg"
   },
   {
     "Timestamp": "2026-09-23 22:03:24.234000",
@@ -192,7 +192,7 @@
     "Approx time it takes for one student to complete the event": "About 30 minutes for the event itself (15 minutes in the crime scene room and 15 minutes to write up),.",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "This is a single round event. A crime scene is staged in advance with props, a suspect pool and witness testimonies, and the story is revealed only on the day. Hidden messages are written in invisible ink and can be read only under UV torchlight, and latent fingerprint evidence is also present at the scene. Chromatography is run a day in advance and the developed results are placed in the crime room as physical evidence. Participants can play individually or in teams of up to 3. Each team first attends a briefing covering the story, evidence locations and the QR codes linked to the evidence. Then they get 15 minutes inside the crime scene room to observe and collect evidence, followed by 15 minutes in the writing room to write up what happened, how it happened, and why. Submissions are then evaluated and the winner is announced. There are no other rules beyond the time limit, since the focus is on observation, deduction and teamwork.",
     "POC for doubts - name and phone number": "Karthik Valluri - 7569599808",
-    "Poster" : ""
+    "Poster" : "/posters26/ForensicInvestigation.png"
   },
   {
     "Timestamp": "2026-09-24 23:35:55.695000",
@@ -231,7 +231,7 @@
     "Approx time it takes for one student to complete the event": "Approximately 1 month. Rounds 1 and 2 will be conducted entirely online over the course of the month. In Round 3, shortlisted finalist teams will present their Round 2 submission — either their Marketing Strategy or Product Strategy & MVP — offline at Technozion, NIT Warangal. Each team will get approximately 5–10 minutes to present their strategy/PPT, followed by 15 minutes of questions and discussion with the judges.",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "The competition will be conducted in 3 rounds.\nRound 1 – Behind the Startup: Online startup teardown and research submission.\nRound 2 – Strategy Build: Online strategy challenge. Teams choose between Marketing Strategy or Product Strategy & MVP Building.\nRound 3 – Boardroom Showdown: Offline final round at Technozion, NIT Warangal, for shortlisted finalist teams.\nRounds 1 and 2 will be conducted online over approximately one month. Participants must submit their work within the deadlines specified by the organizers.\nIn Round 1, each team will pick/be assigned one startup from the curated list of 50 startups and submit a startup teardown covering its journey, key pivots, competitive edge, and what it did differently.\n\nIn Round 2, teams will choose one vertical:\n\nMarketing Strategy\nProduct Strategy & MVP Building\n\nTeams must follow the respective problem statement and submit the required deliverables.\n\nOnly shortlisted teams will advance to Round 3. The final round will be conducted offline at Technozion, NIT Warangal.\nIn Round 3, each finalist team will present the strategy/PPT developed in Round 2. Teams will get approximately 5–10 minutes for their presentation, followed by 15 minutes of Q&A with the judges.\nParticipants must ensure that all submissions are original and prepared by their team. Any plagiarism or use of copied work may result in disqualification.\nTeams must follow the submission format, deadlines, team-size requirements, and other instructions communicated by the organizers.\nThe judges' decisions will be final for the respective rounds",
     "POC for doubts - name and phone number": "Archit: 9005269875\n\nSai Vardhan : 9392141239",
-    "Poster" : "/posters26/VENTURE_VORTEX.jpg"
+    "Poster" : "/posters26/venture_vortex.jpg"
   },
   {
     "Timestamp": "2026-09-26 23:40:37.798000",
@@ -322,7 +322,7 @@
     "Approx time it takes for one student to complete the event": "5-10min",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Each student goes through the smart materials presented and tries to understand and explore it through hands on exposure",
     "POC for doubts - name and phone number": "63013 69387- Karthikeya",
-    "Poster" : ""
+    "Poster" : "/posters26/metamagic-poster.jpeg"
   },
   {
     "Timestamp": "2026-09-28 13:58:39.259000",
@@ -335,7 +335,7 @@
     "Approx time it takes for one student to complete the event": "5min",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "1)Each team gets 5 darts, with one dart played in each round.\n2)The board is divided into labelled metal sectors instead of conventional numerical scoring zones.\nRepresentative event scoring: Steel – 50; Aluminium – 40; Copper – 30; Zinc – 20; Lead – 10.\n3) After each dart, the team answers a short question related to materials stuff based on Marvel theme\n4)Correct answers add points; \nRule: A dart outside labelled sectors receives no metal score.",
     "POC for doubts - name and phone number": "Ishan -  63872 07849",
-    "Poster" : ""
+    "Poster" : "/posters26/Aim-For-Best.jpg"
   },
   {
     "Timestamp": "2026-09-28 14:05:34.006000",
@@ -348,7 +348,7 @@
     "Approx time it takes for one student to complete the event": "30 min",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "1)Design — 10 minutes to select materials, plan the layer configuration and allocate the virtual budget.\n2)Build — 20 minutes to physically construct the thermal protection system.\n3)Test — each team is tested using the same heat source, payload, distance, starting temperature and \nexposure time.\n4)Failure Analysis — teams review their temperature results and identify why their design performed as it \ndid.\n5)Redesign & Retest — teams make limited improvements and test again under the same conditions.",
     "POC for doubts - name and phone number": "Sathwika - 82473 82929",
-    "Poster" : ""
+    "Poster" : "/posters26/MetaArmour.jpeg"
   },
   {
     "Timestamp": "2026-09-28 16:19:27.588000",
@@ -413,6 +413,97 @@
     "Approx time it takes for one student to complete the event": "90 mins",
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Dynamic trading window over 5 simulated trading cycles. Evaluation based on risk management, strategy, and net portfolio return.",
     "POC for doubts - name and phone number": "Jeel (+91 6355 198 983), Naman (+91 70168 79968)",
-    "Poster" : "/posters26/bid_to_build.jpeg"
+    "Poster" : ""
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Satellite and Electronics Amateur Club",
+    "Event Name": "INTO THE VOID",
+    "Event Description mention clearly and elaborately": "VR experience where technology meets thrill, fear, and fun. Participants step into a virtual world filled with unexpected challenges, intense situations, and terrifying surprises, keeping their nerves under control and reacting quickly.",
+    "Event Type": "Game",
+    "Team size (write 1 if individual participation)": "1",
+    "Approx time it takes for one student to complete the event": "3 mins",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Individual VR run within a fixed time limit. Follow coordinators' instructions. No running, jumping, sudden movements, or misuse of VR equipment. Participants may stop at any time if uncomfortable. Coordinators' decision is final.",
+    "POC for doubts - name and phone number": "G. Tharun Reddy - 7032149888",
+    "Poster": "/posters26/Into-the-void.jpg"
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Satellite and Electronics Amateur Club",
+    "Event Name": "Jahaaz",
+    "Event Description mention clearly and elaborately": "Flagship nautical event at the central fountain in front of the Main Building. Custom RC boats (ESP32, 380 DC motor, 30A ESC, MG90S servo rudder, 2S LiPo) tackle a speed sprint, an obstacle slalom, and a head-to-head elimination final through active fountain sprays.",
+    "Event Type": "Competition",
+    "Team size (write 1 if individual participation)": "3",
+    "Approx time it takes for one student to complete the event": "20 mins",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "3 participants and 1 RC boat per team. Navigate the water maze through checkpoints, solve puzzles and dynamic QR challenges, collect electronic components, complete the final circuit and decode the Morse-code message. Highest total valid score wins. No interference, external assistance, QR sharing/tampering or unauthorised shortcuts. Follow marshal instructions; only approved equipment allowed.",
+    "POC for doubts - name and phone number": "Gowri - 6238770785",
+    "Poster": "/posters26/JAHAZ.jpg"
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Science and Astronomy Club",
+    "Event Name": "Model Hovercraft Challenge",
+    "Event Description mention clearly and elaborately": "Workshop and competition in one: teams learn hovercraft mechanics, build a working model from a standard kit, then race it through challenge tracks. Teaches air lift, thrust, reduced friction, and steering control.",
+    "Event Type": "Competition",
+    "Team size (write 1 if individual participation)": "4-5",
+    "Approx time it takes for one student to complete the event": "5 hrs workshop + 2 hrs competition",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Engineering or technically skilled college students; each participant joins only one team; register with a team name. Phase 1: hands-on workshop (Oct 25) to build the kit hovercraft. Phase 2 (Oct 31): kit build check (~2 hrs) and testing with mandatory safety check; no parts outside the official kit. Phase 3: Race, Obstacle Course, Water Race, Precision Landing. Phase 4: scores from all 4 tracks plus judges' design and presentation scores; highest total is Hovercraft Champion.",
+    "POC for doubts - name and phone number": "Sushanth and Adhithya",
+    "Poster": "/posters26/Hover-Craft.jpg"
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Science and Astronomy Club",
+    "Event Name": "Glow Wall",
+    "Event Description mention clearly and elaborately": "Hands-on phosphorescence activity. Use UV light to draw, write, and create patterns on a phosphorescent wall that glows where exposed and fades over time. Try equations, constellations, wave patterns, drawings, or create temporary silhouettes by blocking the UV.",
+    "Event Type": "Demonstration",
+    "Team size (write 1 if individual participation)": "1",
+    "Approx time it takes for one student to complete the event": "5 mins",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Use only the UV lights and materials provided. UV lights only on the Glow Wall, never toward another participant's face or eyes. Designs must be appropriate for a college event.",
+    "POC for doubts - name and phone number": "Zubair - 9989965299\nRupesh - 7569292868",
+    "Poster": "/posters26/Glow-Wall.png"
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "ASME NITW",
+    "Event Name": "Natural Disaster Resilience Track",
+    "Event Description mention clearly and elaborately": "National-level engineering design challenge: teams work on a problem for a month, then present and demonstrate at the fest. Five problem statements (teams may enter any two): PS-01 Flood Vault, PS-02 Ground Zero (earthquake FEM), PS-03 Survivor Seeker (search-and-rescue rover), PS-04 EvacSim (cyclone evacuation planning tool), PS-05 Student Innovation Challenge. Prizes: ₹7,000 for 1st and ₹3,500 for 2nd.",
+    "Event Type": "Competition",
+    "Team size (write 1 if individual participation)": "3-5",
+    "Approx time it takes for one student to complete the event": "Half a day",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Up to two problem statements per team, each judged independently. Per challenge: Design Report (max 5 pages), Engineering Development Log (Excel), and CAD files with assembly drawing (PS-04: source code and simulation model). 3-minute technical presentation before testing. Single live round: PS-01 is a 10-minute submersion test, PS-03 a timed obstacle course, PS-02/04/05 judged on analysis and presentation.",
+    "POC for doubts - name and phone number": "Royce Fran - 95811 82664",
+    "Poster": ""
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Research and Development Club",
+    "Event Name": "Shark Tank 3.0 (NITW Edition)",
+    "Event Description mention clearly and elaborately": "Innovation-driven competition: pick a real-world problem (science, technology, healthcare, sustainability, engineering, education), research it, and build a working functional prototype. Shortlisted teams pitch before a jury judged on innovation, technical execution, problem-solving, functionality, practicality, and presentation.",
+    "Event Type": "Competition",
+    "Team size (write 1 if individual participation)": "2-4",
+    "Approx time it takes for one student to complete the event": "20 mins presentation",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Registration, problem statement selection, research and analysis, solution design, working prototype development, final presentation and demo, jury evaluation and Q&A, results and prize distribution.",
+    "POC for doubts - name and phone number": "Munawar - 9100658648",
+    "Poster": "/posters26/sharktank3.jpeg"
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Research and Development Club",
+    "Event Name": "Deconstruct AI",
+    "Event Description mention clearly and elaborately": "Three-round AI challenge combining prompt engineering, reverse engineering, mathematical logic, and research implementation. Round 1 Prompt to Pixel, Round 2 The Black Box Challenge, Round 3 Research to Reality.",
+    "Event Type": "Game",
+    "Team size (write 1 if individual participation)": "2-3",
+    "Approx time it takes for one student to complete the event": "2 hrs",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Round 1: recreate a complex reference image with AI image generation in a fixed number of attempts; closest matches qualify. Round 2: solve five input-output black-box problems of increasing difficulty; ties broken by time. Round 3: implement a research paper's solution or proof of concept using AI/ML. Final evaluation on implementation, understanding, accuracy, innovation, and presentation.",
+    "POC for doubts - name and phone number": "Siddharth - 9076606330",
+    "Poster": "/posters26/Deconstruct-AI.png"
   }
 ]
