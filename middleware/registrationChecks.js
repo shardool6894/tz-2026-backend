@@ -25,12 +25,15 @@ const isOurCloudinaryUrl = (value) => {
     );
 };
 
-const validateUploads = ({ email, idDocumentUrl, paymentScreenshotUrl }) => {
+const validateUploads = ({ email, idDocumentUrl, paymentScreenshotUrl, requiresPayment }) => {
+    // Fall back to the old lead-only rule if a caller doesn't pass the flag
+    const needsPayment = requiresPayment ?? !isNitwEmail(email);
+
     if (!isOurCloudinaryUrl(idDocumentUrl)) {
         return 'A valid ID document upload is required';
     }
-    if (!isNitwEmail(email) && !isOurCloudinaryUrl(paymentScreenshotUrl)) {
-        return 'A valid payment screenshot upload is required for non-NITW emails';
+    if (needsPayment && !isOurCloudinaryUrl(paymentScreenshotUrl)) {
+        return 'A valid payment screenshot upload is required when any team member is not from NITW';
     }
     return null;
 };
