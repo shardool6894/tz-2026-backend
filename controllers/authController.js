@@ -140,9 +140,7 @@ const register = async (req, res) => {
         }
 
         res.status(201).json({
-            message: emailSent
-                ? 'Account created. Check your email for a verification link before logging in.'
-                : "Account created, but we couldn't send the verification email. Use \"Resend verification email\" on the login page.",
+            message: "Account created",
             email: user.email,
             emailSent,
             participants: [
