@@ -25,11 +25,14 @@ const register = async (req, res) => {
             paymentScreenshotUrl = null
         } = req.body || {};
         const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+        const memberList = registrationType === 'team' && Array.isArray(teamMembers) ? teamMembers : [];
+        const requiresPayment =
+            !isNitwEmail(email) || memberList.some((member) => member?.studentType !== 'nitw');
         // Validation
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email and password are required" });
         }
-        const uploadError = validateUploads({ email, idDocumentUrl, paymentScreenshotUrl });
+        const uploadError = validateUploads({ email, idDocumentUrl, paymentScreenshotUrl, requiresPayment });
         if (uploadError) {
             return res.status(400).json({ message: uploadError });
         }
@@ -93,8 +96,7 @@ const register = async (req, res) => {
             ...identities,
             events: eventIds,
             idDocumentUrl,
-            paymentScreenshotUrl : isNitwEmail(email) ? null : paymentScreenshotUrl,
-            paymentScreenshotUrl : isNitwEmail(email) ? null : paymentScreenshotUrl,
+            paymentScreenshotUrl: requiresPayment ? paymentScreenshotUrl : null,
             emailVerified: false,
             emailVerificationTokenHash: verification.hash,
             emailVerificationExpires: verification.expires,
