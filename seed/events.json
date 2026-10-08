@@ -505,5 +505,18 @@
     "Rules of the Event, include how many rounds, any procedure to follow, etc.": "Round 1: recreate a complex reference image with AI image generation in a fixed number of attempts; closest matches qualify. Round 2: solve five input-output black-box problems of increasing difficulty; ties broken by time. Round 3: implement a research paper's solution or proof of concept using AI/ML. Final evaluation on implementation, understanding, accuracy, innovation, and presentation.",
     "POC for doubts - name and phone number": "Siddharth - 9076606330",
     "Poster": "/posters26/Deconstruct-AI.png"
+  },
+  {
+    "Timestamp": "",
+    "Email Address": "",
+    "Club Name": "Siemens",
+    "Event Name": "Technozion Data Science Hackathon",
+    "Event Description mention clearly and elaborately": "The Technozion Data Science Hackathon, supported by Siemens, is a two-level competition where participants create data-driven intelligent applications by combining AI-powered analytics with modern application development platforms, using Rapidminer AI Studio.\n\nLevel 1 (Online): teams develop innovative solutions to a given real-world problem statement using data analysis, predictive modelling and intelligent decision-making. The top-performing teams are shortlisted for Level 2.\n\nLevel 2 (Offline Finals): shortlisted teams come to NIT Warangal, where they work on a new challenge and/or enhance their existing solution in a live, in-person environment.\n\nOpen to students from any institution, any year and any discipline. Prize pool: ₹25,000 (via merchandise).",
+    "Event Type": "Competition",
+    "Team size (write 1 if individual participation)": "1-3",
+    "Approx time it takes for one student to complete the event": "Level 1 online (Oct 12-24, 2026) + Level 2 offline finals (Oct 30-31, 2026)",
+    "Rules of the Event, include how many rounds, any procedure to follow, etc.": "1. Teams of 1-3 members; any institution, any year. All team members must have valid student email IDs.\n2. Level 1 (Online, Oct 12-24, 2026): the problem statement and dataset are released on Oct 12. Teams develop a solution using Rapidminer AI Studio (additional tools/platforms optional).\n3. Level 1 submission: a single zip named College_Abbreviation_TeamName.zip (e.g. NITW_DataDriven.zip) containing the Rapidminer session file (.rmp), a project presentation (problem understanding & approach, technical stack & tools, key insights & results, credits for tools/libraries/data sources), a 5-15 minute video demo uploaded to YouTube (explicitly mention AI Studio if used), and the dataset. Submitted via a Google Form shared near the deadline.\n4. Evaluation: model performance, depth of tool exploration, and solution presentation. Top teams are shortlisted for Level 2.\n5. Level 2 (Offline Finals, Oct 30-31, 2026, NIT Warangal): shortlisted teams must attend in person and bring their own laptops capable of running Rapidminer AI Studio. Teams work on a new problem statement and/or enhance their Level 1 solution.\n6. Level 2 submission: same package as Level 1, video demo not required.\n7. Registration opens Oct 7, 2026 and closes Oct 24, 2026; participants must fill the registration form and join the official WhatsApp group for updates.",
+    "POC for doubts - name and phone number": "",
+    "Poster": "/posters26/SiemensDSH.png"
   }
 ]
