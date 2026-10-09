@@ -18,6 +18,8 @@ const register = async (req, res) => {
             collegeName,
             rollNumber,
             accommodation,
+            needAccommodation,
+            needAccomodation,
             registrationType = 'individual',
             teamMembers = [],
             events = [],
@@ -81,7 +83,10 @@ const register = async (req, res) => {
         }
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
-        const accommodationBool = accommodation === true || accommodation === 'true' || accommodation === '1' || accommodation === 1;
+        const accommodationBool =
+            accommodation === true || accommodation === 'true' || accommodation === '1' || accommodation === 1 ||
+            needAccommodation === true || needAccommodation === 'true' || needAccommodation === '1' || needAccommodation === 1 ||
+            needAccomodation === true || needAccomodation === 'true' || needAccomodation === '1' || needAccomodation === 1;
         const role = 'user'
         const verification = newVerificationToken();
         // Prepare user payload
