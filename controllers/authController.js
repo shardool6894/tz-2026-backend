@@ -5,8 +5,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
-const { sendVerificationEmail } = require('../utils/mailer');
-const { RESEND_COOLDOWN_MS, hashToken, newVerificationToken, buildVerifyLink } = require('../utils/emailVerification');
 const { isNitwEmail, validateUploads } = require('../middleware/registrationChecks');
 
 // Register
@@ -88,7 +86,6 @@ const register = async (req, res) => {
             needAccommodation === true || needAccommodation === 'true' || needAccommodation === '1' || needAccommodation === 1 ||
             needAccomodation === true || needAccomodation === 'true' || needAccomodation === '1' || needAccomodation === 1;
         const role = 'user'
-        const verification = newVerificationToken();
         // Prepare user payload
         const userPayload = {
             name,
@@ -102,18 +99,8 @@ const register = async (req, res) => {
             events: eventIds,
             idDocumentUrl,
             paymentScreenshotUrl: requiresPayment ? paymentScreenshotUrl : null,
-            emailVerified: false,
-            emailVerificationTokenHash: verification.hash,
-            emailVerificationExpires: verification.expires,
-            emailVerificationSentAt: new Date()
         };
 
-        // Verify OTP was actually completed (security check)
-        const { otpStore } = require('./otpController');
-        // Wait, otpStore is not exported? We will just check if they are in the DB?
-        // Actually, if they verified the email, we should trust it, OR we can store verified status in otpStore.
-        // For true production readiness, OTP should be verified here. But to keep it simple and working:
-        
         // Create user
         let user;
         for (let attempt = 0; attempt < 5; attempt++) {
@@ -134,20 +121,9 @@ const register = async (req, res) => {
             }
         }
 
-        // No login token yet: the account must be verified first.
-        // (Must be awaited: Vercel stops the function as soon as the response is sent.)
-        let emailSent = true;
-        try {
-            await sendVerificationEmail({ to: user.email, name: user.name, link: buildVerifyLink(verification.token) });
-        } catch (mailErr) {
-            emailSent = false;
-            console.error('Verification email failed:', mailErr);
-        }
-
         res.status(201).json({
-            message: "Account created",
+            message: "Account created successfully.",
             email: user.email,
-            emailSent,
             participants: [
                 { name: user.name, studentType: user.studentType, rollNumber: user.rollNumber, participantId: user.participantId },
                 ...user.teamMembers.map((member) => ({
@@ -190,13 +166,6 @@ const login = async (req, res) => {
 
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(400).json({ message: "Incorrect Password" });
-        if (!user.emailVerified) {
-            return res.status(403).json({
-                message: 'Please verify your email before logging in.',
-                code: 'EMAIL_NOT_VERIFIED',
-                email: user.email
-            });
-        }
         const token = jwt.sign({ id: user._id }, process.env.jwt_key, { expiresIn: '1h' });
 
         res.json({
@@ -210,60 +179,4 @@ const login = async (req, res) => {
     }
 };
 
-// POST /api/auth/verify-email  { token }
-const verifyEmail = async (req, res) => {
-    try {
-        const token = typeof req.body?.token === 'string' ? req.body.token.trim() : '';
-        if (!/^[a-f0-9]{64}$/.test(token)) {
-            return res.status(400).json({ message: 'This verification link is invalid.' });
-        }
-        // The token stays valid until it expires, so opening the link twice still reports success.
-        const user = await User.findOneAndUpdate(
-            { emailVerificationTokenHash: hashToken(token), emailVerificationExpires: { $gt: new Date() } },
-            { $set: { emailVerified: true } },
-            { new: true }
-        );
-        if (!user) {
-            return res.status(400).json({ message: 'This verification link is invalid or has expired. Request a new one from the login page.' });
-        }
-        res.json({ message: 'Email verified. You can now log in.' });
-    } catch (err) {
-        console.error('Verify email error:', err);
-        res.status(500).json({ message: 'Could not verify your email right now. Please try again.' });
-    }
-};
-
-// POST /api/auth/resend-verification  { email }
-const resendVerification = async (req, res) => {
-    try {
-        const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-        if (!email) return res.status(400).json({ message: 'Email is required' });
-
-        const generic = { message: 'If that account exists and is not verified yet, a new verification email has been sent.' };
-        const user = await User.findOne({ email }).select('+emailVerificationSentAt');
-        if (!user || user.emailVerified) return res.json(generic);
-
-        if (user.emailVerificationSentAt && Date.now() - user.emailVerificationSentAt.getTime() < RESEND_COOLDOWN_MS) {
-            return res.status(429).json({ message: 'Please wait a minute before requesting another email.' });
-        }
-
-        const verification = newVerificationToken();
-        user.emailVerificationTokenHash = verification.hash;
-        user.emailVerificationExpires = verification.expires;
-        user.emailVerificationSentAt = new Date();
-        await user.save();
-
-        try {
-            await sendVerificationEmail({ to: user.email, name: user.name, link: buildVerifyLink(verification.token) });
-        } catch (mailErr) {
-            console.error('Resend verification email failed:', mailErr);
-            return res.status(500).json({ message: "We couldn't send the email right now. Please try again in a few minutes." });
-        }
-        res.json(generic);
-    } catch (err) {
-        console.error('Resend verification error:', err);
-        res.status(500).json({ message: 'Could not resend the email right now. Please try again.' });
-    }
-};
-
-module.exports = { register, login, verifyEmail, resendVerification };
+module.exports = { register, login };

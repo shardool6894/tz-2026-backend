@@ -16,10 +16,7 @@ const loadController = (User) => {
     'jsonwebtoken': { sign: () => 'test-token' },
     'mongoose': { Types: { ObjectId: { isValid: () => true } } },
     '../models/Event': {},
-    '../utils/mailer': { sendVerificationEmail: async () => {} },
-    '../utils/emailVerification': { newVerificationToken: () => ({ hash: 'test-hash', token: 'test-token' }), buildVerifyLink: () => 'test-link' },
     '../middleware/registrationChecks': { isNitwEmail, validateUploads: () => null },
-    './otpController': {},
   };
   vm.runInNewContext(fs.readFileSync(require.resolve('../controllers/authController'), 'utf8'), {
     module, exports: module.exports, require: (name) => {
@@ -71,7 +68,7 @@ test('database duplicate participant IDs return a conflict instead of overwritin
 });
 
 test('login returns stored IDs unchanged', async () => {
-  const stored = { ...body, ...buildParticipantIdentities(body), emailVerified: true, registrationNum: '042' };
+  const stored = { ...body, ...buildParticipantIdentities(body), registrationNum: '042' };
   const controller = loadController({ findOne: async () => stored });
   const res = response();
   await controller.login({ body: { email: body.email, password: body.password } }, res);
