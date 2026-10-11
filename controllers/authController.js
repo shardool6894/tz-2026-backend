@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Event = require('../models/Event');
 const { isNitwEmail, validateUploads } = require('../middleware/registrationChecks');
 
+
 // Register
 const register = async (req, res) => {
     try {
@@ -28,6 +29,7 @@ const register = async (req, res) => {
         const memberList = registrationType === 'team' && Array.isArray(teamMembers) ? teamMembers : [];
         const requiresPayment =
             !isNitwEmail(email) || memberList.some((member) => member?.studentType !== 'nitw');
+
         // Validation
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email and password are required" });
@@ -36,6 +38,7 @@ const register = async (req, res) => {
         if (uploadError) {
             return res.status(400).json({ message: uploadError });
         }
+
         // Check if email already exists
         const exist = await User.findOne({ email });
         if (exist) {
@@ -45,16 +48,17 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "Password must be at least 8 characters" });
         }
 
-        // Validate team registration
+        // Validate team registration (total 1-4 members: Lead + 0-3 teammates)
         if (registrationType === 'team') {
             if (!Array.isArray(teamMembers) || teamMembers.length < 1) {
                 return res.status(400).json({ 
                     message: "Team registration requires at least 1 additional member" 
                 });
             }
-            if (teamMembers.length > 4) {
+            // Max 3 additional members + 1 lead = 4 members total
+            if (teamMembers.length > 3) {
                 return res.status(400).json({ 
-                    message: "Maximum team size is 5 members (including leader)" 
+                    message: "Maximum team size is 4 members (including leader)" 
                 });
             }
             // Validate each team member has a name
@@ -65,9 +69,30 @@ const register = async (req, res) => {
                 });
             }
         }
+
+        // Normalize accommodation booleans for each team member
+        const sanitizedTeamMembers = (registrationType === 'team' ? teamMembers : []).map(member => ({
+            ...member,
+            name: member.name?.trim(),
+            accommodation: Boolean(member.accommodation || member.needAccommodation || member.needAccomodation),
+            needAccommodation: Boolean(member.accommodation || member.needAccommodation || member.needAccomodation),
+        }));
+
         const identities = buildParticipantIdentities({
-            email, rollNumber, teamMembers: registrationType === 'team' ? teamMembers : [],
+            email, 
+            rollNumber, 
+            teamMembers: sanitizedTeamMembers,
         });
+
+        // Ensure accommodation flags are preserved if buildParticipantIdentities strips custom properties
+        if (Array.isArray(identities.teamMembers)) {
+            identities.teamMembers = identities.teamMembers.map((m, idx) => ({
+                ...m,
+                accommodation: sanitizedTeamMembers[idx]?.accommodation || false,
+                needAccommodation: sanitizedTeamMembers[idx]?.needAccommodation || false,
+            }));
+        }
+
         const eventIds = [...new Set((Array.isArray(events) ? events : []).map(String))];
         // Events are optional at registration; users can add them later from their profile
         if (!eventIds.every((id) => mongoose.Types.ObjectId.isValid(id))) {
@@ -79,21 +104,24 @@ const register = async (req, res) => {
                 return res.status(400).json({ message: "One or more selected events are invalid or closed" });
             }
         }
+
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         const accommodationBool =
             accommodation === true || accommodation === 'true' || accommodation === '1' || accommodation === 1 ||
             needAccommodation === true || needAccommodation === 'true' || needAccommodation === '1' || needAccommodation === 1 ||
             needAccomodation === true || needAccomodation === 'true' || needAccomodation === '1' || needAccomodation === 1;
-        const role = 'user'
+        const role = 'user';
+
         // Prepare user payload
         const userPayload = {
             name,
             email,
             password: hashedPassword,
-            roles : role,
+            roles: role,
             collegeName: collegeName || undefined,
             accommodation: accommodationBool,
+            needAccommodation: accommodationBool,
             registrationType,
             ...identities,
             events: eventIds,
@@ -101,7 +129,7 @@ const register = async (req, res) => {
             paymentScreenshotUrl: requiresPayment ? paymentScreenshotUrl : null,
         };
 
-        // Create user
+        // Create user with retry logic for ID collision
         let user;
         for (let attempt = 0; attempt < 5; attempt++) {
             try {
@@ -116,8 +144,16 @@ const register = async (req, res) => {
                 if (attempt === 4 || error.code !== 11000 || !error.keyPattern?.participantIds || !externalIds.includes(conflictingId)) {
                     throw error;
                 }
-                // A short random ID can collide; regenerate before retrying the atomic insert.
-                Object.assign(userPayload, buildParticipantIdentities({ email, rollNumber, teamMembers: registrationType === 'team' ? teamMembers : [] }));
+                // Regenerate identities before retrying
+                const freshIdentities = buildParticipantIdentities({ email, rollNumber, teamMembers: sanitizedTeamMembers });
+                if (Array.isArray(freshIdentities.teamMembers)) {
+                    freshIdentities.teamMembers = freshIdentities.teamMembers.map((m, idx) => ({
+                        ...m,
+                        accommodation: sanitizedTeamMembers[idx]?.accommodation || false,
+                        needAccommodation: sanitizedTeamMembers[idx]?.needAccommodation || false,
+                    }));
+                }
+                Object.assign(userPayload, freshIdentities);
             }
         }
 
@@ -125,9 +161,21 @@ const register = async (req, res) => {
             message: "Account created successfully.",
             email: user.email,
             participants: [
-                { name: user.name, studentType: user.studentType, rollNumber: user.rollNumber, participantId: user.participantId },
+                { 
+                    name: user.name, 
+                    studentType: user.studentType, 
+                    rollNumber: user.rollNumber, 
+                    participantId: user.participantId,
+                    accommodation: user.accommodation || user.needAccommodation || false,
+                    needAccommodation: user.accommodation || user.needAccommodation || false
+                },
                 ...user.teamMembers.map((member) => ({
-                    name: member.name, studentType: member.studentType, rollNumber: member.rollNumber, participantId: member.participantId,
+                    name: member.name, 
+                    studentType: member.studentType, 
+                    rollNumber: member.rollNumber, 
+                    participantId: member.participantId,
+                    accommodation: member.accommodation || member.needAccommodation || false,
+                    needAccommodation: member.accommodation || member.needAccommodation || false
                 })),
             ]
         });

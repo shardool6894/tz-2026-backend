@@ -4,8 +4,10 @@ const teamMemberSchema = new mongoose.Schema({
     name: { type: String, required: true },
     studentType: { type: String, enum: ['nitw', 'external'] },
     rollNumber: { type: String, default: null },
-    participantId: { type: String }
-}, { _id: false }); // _id: false prevents Mongoose from creating an _id for each team member
+    participantId: { type: String },
+    accommodation: { type: Boolean, default: false },
+    needAccommodation: { type: Boolean, default: false }
+}, { _id: false });
 
 const counterSchema = new mongoose.Schema({
   name: String,
@@ -24,6 +26,7 @@ const userSchema = new mongoose.Schema({
     // One multikey index covers IDs of both the leader and every embedded member.
     participantIds: { type: [String], default: undefined, select: false },
     accommodation: { type: Boolean, default: false },
+    needAccommodation: { type: Boolean, default: false },
     registrationType: { 
         type: String, 
         enum: ['individual', 'team'], 
@@ -36,18 +39,18 @@ const userSchema = new mongoose.Schema({
         validate: {
             validator: function(arr) {
                 if (this.registrationType === 'team') {
-                    return arr.length >= 1 && arr.length <= 4;
+                    // 1-3 additional members = 2-4 total members including leader
+                    return Array.isArray(arr) && arr.length >= 1 && arr.length <= 3;
                 }
                 return true;
             },
-            message: 'Team must have 1-4 additional members (2-5 total including leader)'
+            message: 'Team must have 1-3 additional members (2-4 total including leader)'
         }
     },
     events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
-    roles: {type: String, enum: ['user', 'admin'], default: 'user'},
+    roles: { type: String, enum: ['user', 'admin'], default: 'user' },
     idDocumentUrl: { type: String, default: null },
-    paymentScreenshotUrl: { type: String, default: null },
-    registrationNum: { type: String, unique: true }
+    paymentScreenshotUrl: { type: String, default: null }
 }, { timestamps: true });
 
 // Sparse preserves existing accounts without changing their registration numbers.
