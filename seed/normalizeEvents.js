@@ -1,3 +1,4 @@
+const prizes = require("./prizes.json");
 const PHONE_RE = /(?:\+?91[\s-]*)?([6-9]\d{4}[\s-]?\d{5})/;
 const EMPTY_VALUES = /^(none|nil|n\/?a|not applicable|na|-|tbd|coming soon\.*)$/i;
 const clean = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
@@ -43,8 +44,9 @@ function normalizeEvent(raw, index = 0) {
   const name = clean(raw["Event Name"]);
   const description = (raw["Event Description mention clearly and elaborately"] || "").toString().trim();
   const teamRaw = clean(raw["Team size (write 1 if individual participation)"]);
+  const slug = slugify(name) || `event-${index + 1}`;
   return {
-    slug: slugify(name) || `event-${index + 1}`,
+    slug,
     name,
     club: clean(raw["Club Name"]),
     description,
@@ -54,6 +56,7 @@ function normalizeEvent(raw, index = 0) {
     rules: parseRules(raw["Rules of the Event, include how many rounds, any procedure to follow, etc."]),
     contact: parseContacts(raw["POC for doubts - name and phone number"]),
     totalCost: parsePrize(description),
+    cashPrize: prizes[slug] || "",
     judgingCriteria: "Coming Soon...",
     imgsrc: (raw["Poster"] || "").toString().trim(),
     glink: "",
