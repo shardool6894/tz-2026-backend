@@ -27,6 +27,15 @@ if (process.env.jwt_key.length < 16) {
   console.warn('Warning: jwt_key is very short. Use a long random string in production.');
 }
 const app = express();
+// Rate limiting keys on req.ip, so Express must know how many proxies sit in front of it.
+// Wrong value = everyone shares one IP (site-wide lockout) or IPs can be spoofed.
+// Vercel is 1 hop; elsewhere set TRUST_PROXY (e.g. TRUST_PROXY=1 on Render/Railway).
+if (process.env.TRUST_PROXY) {
+  const hops = Number(process.env.TRUST_PROXY);
+  app.set('trust proxy', Number.isNaN(hops) ? process.env.TRUST_PROXY : hops);
+} else if (process.env.VERCEL) {
+  app.set('trust proxy', 1);
+}
 const { createCorsOptions } = require('./utils/corsOptions');
 app.use(cors(createCorsOptions()));
 
